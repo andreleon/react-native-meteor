@@ -2,7 +2,7 @@ import Data from '../Data';
 import { hashPassword } from '../../lib/utils';
 import call from '../Call';
 
-const TOKEN_KEY = 'reactnativemeteor_usertoken';
+const TOKEN_KEY = 'Meteor.loginToken';
 
 module.exports = {
   user() {
