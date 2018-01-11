@@ -130,7 +130,7 @@ module.exports = {
   getAuthToken: function getAuthToken() {
     return _Data2.default._tokenIdSaved;
   },
-  _loadInitialUser: async function _loadInitialUser() {
+  _loadInitialUser: function _loadInitialUser() {
     var value = null;
     try {
       value = localStorage.getItem(TOKEN_KEY);

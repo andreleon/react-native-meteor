@@ -109,7 +109,7 @@ module.exports = {
   getAuthToken() {
     return Data._tokenIdSaved;
   },
-  async _loadInitialUser() {
+  _loadInitialUser() {
     var value = null;
     try {
       value = localStorage.getItem(TOKEN_KEY);
