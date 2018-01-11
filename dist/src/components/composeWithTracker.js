@@ -4,19 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _trackr = require('trackr');
-
-var _trackr2 = _interopRequireDefault(_trackr);
-
-var _reactKomposer = require('react-komposer');
-
-var _Data = require('../Data');
-
-var _Data2 = _interopRequireDefault(_Data);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function composeWithTracker(reactiveFn, L, E, options) {
+exports.default = function (reactiveFn, L, E, options) {
   var onPropsChange = function onPropsChange(props, onData) {
     var trackerCleanup = void 0;
 
@@ -44,6 +32,16 @@ function composeWithTracker(reactiveFn, L, E, options) {
   };
 
   return (0, _reactKomposer.compose)(onPropsChange, L, E, options);
-}
+};
 
-exports.default = composeWithTracker;
+var _trackr = require('trackr');
+
+var _trackr2 = _interopRequireDefault(_trackr);
+
+var _reactKomposer = require('react-komposer');
+
+var _Data = require('../Data');
+
+var _Data2 = _interopRequireDefault(_Data);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

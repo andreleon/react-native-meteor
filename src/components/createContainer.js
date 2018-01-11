@@ -7,7 +7,7 @@ import createReactClass from 'create-react-class';
 
 import Mixin from './Mixin';
 
-function createContainer(options = {}, Component) {
+export default function createContainer(options = {}, Component) {
   let expandedOptions = options;
   if (typeof options === 'function') {
     expandedOptions = {
@@ -30,5 +30,3 @@ function createContainer(options = {}, Component) {
     },
   });
 }
-
-export default createContainer;

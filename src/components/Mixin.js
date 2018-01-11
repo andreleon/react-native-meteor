@@ -2,7 +2,7 @@ import Trackr from 'trackr';
 import EJSON from 'ejson';
 import Data from '../Data';
 
-const Mixin = {
+export default {
   componentWillMount() {
 
     Data.waitDdpReady(()=>{
@@ -176,4 +176,3 @@ class MeteorDataManager {
   }
 }
 
- export default Mixin;

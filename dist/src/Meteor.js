@@ -1,9 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _reactMixin = require('react-mixin');
@@ -62,7 +58,7 @@ var _Accounts2 = _interopRequireDefault(_Accounts);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Meteor = _extends({
+module.exports = _extends({
   composeWithTracker: _composeWithTracker2.default,
   Accounts: _Accounts2.default,
   Tracker: _trackr2.default,
@@ -332,4 +328,3 @@ var Meteor = _extends({
     return handle;
   }
 });
-exports.default = Meteor;

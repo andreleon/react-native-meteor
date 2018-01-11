@@ -1,9 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _Data = require('../Data');
 
 var _Data2 = _interopRequireDefault(_Data);
@@ -20,7 +16,7 @@ var _utils = require('../../lib/utils');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Accounts = {
+module.exports = {
   createUser: function createUser(options) {
     var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
 
@@ -87,5 +83,3 @@ var Accounts = {
     _Data2.default.on('onLoginFailure', cb);
   }
 };
-
-exports.default = Accounts;

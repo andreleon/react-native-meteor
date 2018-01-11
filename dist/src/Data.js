@@ -21,11 +21,11 @@ db.debug = false;
 
 function runAfterOtherComputations(fn) {
   _trackr2.default.afterFlush(function () {
-    return fn();
+    fn();
   });
 }
 
-var Data = {
+exports.default = {
   _endpoint: null,
   _options: null,
   ddp: null,
@@ -96,5 +96,3 @@ var Data = {
     }
   }
 };
-
-exports.default = Data;

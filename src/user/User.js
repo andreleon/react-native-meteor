@@ -3,7 +3,8 @@ import { hashPassword } from '../../lib/utils';
 import call from '../Call';
 
 const TOKEN_KEY = 'Meteor.loginToken';
-const User = {
+
+module.exports = {
   user() {
     if(!this._userIdSaved) return null;
 
@@ -120,5 +121,3 @@ const User = {
 
   }
 }
-
-export default User;
