@@ -1,30 +1,24 @@
 {
-  "name": "react-native-meteor",
+  "name": "react-web-meteor",
   "version": "1.2.0",
-  "description": "Full Meteor Client for React Native",
+  "description": "Full Meteor Client for React Web (port from react-native-meteor)",
   "main": "src/Meteor.js",
   "scripts": {
     "test": "mocha --compilers js:babel-core/register --require test/setup --recursive"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/inProgress-team/react-native-meteor.git"
+    "url": "git+https://github.com/andreleon/react-web-meteor.git"
   },
   "keywords": [
     "react-component",
     "ddp",
     "meteor",
-    "react",
-    "react-native",
-    "ios",
-    "android"
+    "react"
   ],
-  "author": "Théo Mathieu",
+  "author": "Leon Smit",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/inProgress-team/react-native-meteor/issues"
-  },
-  "homepage": "https://github.com/inProgress-team/react-native-meteor#readme",
+  "homepage": "https://github.com/andreleon/react-web-meteor",
   "dependencies": {
     "base-64": "^0.1.0",
     "create-react-class": "^15.6.0",
@@ -49,7 +43,6 @@
     "sinon": "^1.17.3"
   },
   "peerDependencies": {
-    "react": "*",
-    "react-native": "^0.46.0"
+    "react": "*"
   }
 }

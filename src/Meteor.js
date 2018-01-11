@@ -1,6 +1,3 @@
-
-import { NetInfo, Platform, View } from 'react-native';
-
 import reactMixin from 'react-mixin';
 import Trackr from 'trackr';
 import EJSON from 'ejson';
@@ -12,13 +9,8 @@ import { Collection } from './Collection';
 import call from './Call';
 
 import Mixin from './components/Mixin';
-import MeteorListView from './components/ListView';
-import MeteorComplexListView from './components/ComplexListView';
 import createContainer from './components/createContainer';
 import composeWithTracker from './components/composeWithTracker';
-
-import FSCollection from './CollectionFS/FSCollection';
-import FSCollectionImagesPreloader from './CollectionFS/FSCollectionImagesPreloader';
 
 import ReactiveDict from './ReactiveDict';
 
@@ -31,13 +23,9 @@ module.exports = {
   Accounts,
   Tracker: Trackr,
   EJSON,
-  MeteorListView,
-  MeteorComplexListView,
   ReactiveDict,
   Collection,
-  FSCollectionImagesPreloader: Platform.OS == 'android' ? View : FSCollectionImagesPreloader,
   collection(name, options) { return new Collection(name, options) },
-  FSCollection,
   createContainer,
   getData() {
     return Data;
@@ -88,12 +76,9 @@ module.exports = {
       ...options
     });
 
-    NetInfo.isConnected.addEventListener('connectionChange', isConnected=>{
-      if(isConnected && Data.ddp.autoReconnect) {
-        Data.ddp.connect();
-      }
-    });
-
+    if(Data.ddp.autoReconnect) {
+      Data.ddp.connect();
+    }
 
     Data.ddp.on("connected", ()=>{
 
@@ -106,7 +91,7 @@ module.exports = {
 
       Data.notify('change');
 
-      console.info("Connected to DDP server.");
+      console.log("Connected to DDP server.");
       this._loadInitialUser().then(() => {
         this._subscriptionsRestart();
       });
@@ -117,7 +102,7 @@ module.exports = {
 
       Data.notify('change');
 
-      console.info("Disconnected from DDP server.");
+      console.log("Disconnected from DDP server.");
 
       if (!Data.ddp.autoReconnect) return;
 
