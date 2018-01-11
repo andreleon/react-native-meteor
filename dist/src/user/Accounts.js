@@ -3,7 +3,7 @@ import call from '../Call';
 import User from './User';
 import { hashPassword } from '../../lib/utils';
 
-module.exports = {
+const Accounts = {
   createUser(options, callback = () => {}) {
     if (options.username) options.username = options.username;
     if (options.email) options.email = options.email;
@@ -62,3 +62,5 @@ module.exports = {
     Data.on('onLoginFailure', cb);
   }
 };
+
+export default Accounts;
