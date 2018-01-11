@@ -12,8 +12,6 @@ var _Call2 = _interopRequireDefault(_Call);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 var TOKEN_KEY = 'Meteor.loginToken';
 
 module.exports = {
@@ -132,31 +130,14 @@ module.exports = {
   getAuthToken: function getAuthToken() {
     return _Data2.default._tokenIdSaved;
   },
-  _loadInitialUser: function _loadInitialUser() {
-    var _this6 = this;
-
-    return _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-      var value;
-      return regeneratorRuntime.wrap(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              value = null;
-
-              try {
-                value = localStorage.getItem(TOKEN_KEY);
-              } catch (error) {
-                console.warn('localStorage error: ' + error.message);
-              } finally {
-                _this6._loginWithToken(value);
-              }
-
-            case 2:
-            case 'end':
-              return _context.stop();
-          }
-        }
-      }, _callee, _this6);
-    }))();
+  _loadInitialUser: async function _loadInitialUser() {
+    var value = null;
+    try {
+      value = localStorage.getItem(TOKEN_KEY);
+    } catch (error) {
+      console.warn('localStorage error: ' + error.message);
+    } finally {
+      this._loginWithToken(value);
+    }
   }
 };
