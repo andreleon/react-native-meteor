@@ -3,7 +3,7 @@ import { compose } from 'react-komposer';
 
 import Data from '../Data';
 
-export default function (reactiveFn, L, E, options) {
+function composeWithTracker(reactiveFn, L, E, options) {
   const onPropsChange = (props, onData) => {
     let trackerCleanup;
 
@@ -32,3 +32,5 @@ export default function (reactiveFn, L, E, options) {
 
   return compose(onPropsChange, L, E, options);
 }
+
+export default composeWithTracker;

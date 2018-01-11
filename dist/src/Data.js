@@ -6,9 +6,7 @@ const db = new minimongo();
 db.debug = false;
 
 function runAfterOtherComputations(fn) {
-  Trackr.afterFlush(() => {
-    fn();
-  });
+  Trackr.afterFlush(() => fn());
 }
 
 const Data = {
