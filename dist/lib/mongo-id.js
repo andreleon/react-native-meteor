@@ -9,7 +9,7 @@ var _ejson2 = _interopRequireDefault(_ejson);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-MongoID = {};
+var MongoID = {};
 
 MongoID._looksLikeObjectID = function (str) {
   return str.length === 24 && str.match(/^[0-9a-f]*$/);
