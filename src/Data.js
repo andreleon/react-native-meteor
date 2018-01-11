@@ -5,13 +5,13 @@ process.nextTick = setImmediate;
 const db = new minimongo();
 db.debug = false;
 
-function runAfterOtherComputations(fn){
+function runAfterOtherComputations(fn) {
   Trackr.afterFlush(() => {
     fn();
   });
 }
 
-export default {
+const Data = {
   _endpoint: null,
   _options: null,
   ddp: null,
@@ -74,3 +74,5 @@ export default {
     }
   }
 }
+
+export default Data;

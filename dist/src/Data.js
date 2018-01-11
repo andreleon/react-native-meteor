@@ -11,7 +11,7 @@ function runAfterOtherComputations(fn) {
   });
 }
 
-export default {
+const Data = {
   _endpoint: null,
   _options: null,
   ddp: null,
@@ -76,3 +76,5 @@ export default {
     }
   }
 };
+
+export default Data;

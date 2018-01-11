@@ -1,6 +1,6 @@
 import Data from './Data';
 
-export default function (eventName) {
+const call = function (eventName) {
   var args = Array.prototype.slice.call(arguments, 1);
   if (args.length && typeof args[args.length - 1] === "function") {
     var callback = args.pop();
@@ -11,4 +11,6 @@ export default function (eventName) {
     id: id,
     callback: callback
   });
-}
+};
+
+export default call;

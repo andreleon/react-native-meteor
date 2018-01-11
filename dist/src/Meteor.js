@@ -19,7 +19,7 @@ import ReactiveDict from './ReactiveDict';
 import User from './user/User';
 import Accounts from './user/Accounts';
 
-module.exports = _extends({
+const Meteor = _extends({
   composeWithTracker,
   Accounts,
   Tracker: Trackr,
@@ -280,3 +280,4 @@ module.exports = _extends({
     return handle;
   }
 });
+export default Meteor;
