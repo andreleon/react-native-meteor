@@ -1,165 +1,217 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-import reactMixin from 'react-mixin';
-import Trackr from 'trackr';
-import EJSON from 'ejson';
-import DDP from '../lib/ddp.js';
-import Random from '../lib/Random';
+var _reactMixin = require('react-mixin');
 
-import Data from './Data';
-import { Collection } from './Collection';
-import call from './Call';
+var _reactMixin2 = _interopRequireDefault(_reactMixin);
 
-import Mixin from './components/Mixin';
-import createContainer from './components/createContainer';
-import composeWithTracker from './components/composeWithTracker';
+var _trackr = require('trackr');
 
-import ReactiveDict from './ReactiveDict';
+var _trackr2 = _interopRequireDefault(_trackr);
 
-import User from './user/User';
-import Accounts from './user/Accounts';
+var _ejson = require('ejson');
 
-const Meteor = _extends({
-  composeWithTracker,
-  Accounts,
-  Tracker: Trackr,
-  EJSON,
-  ReactiveDict,
-  Collection,
-  collection(name, options) {
-    return new Collection(name, options);
+var _ejson2 = _interopRequireDefault(_ejson);
+
+var _ddp = require('../lib/ddp.js');
+
+var _ddp2 = _interopRequireDefault(_ddp);
+
+var _Random = require('../lib/Random');
+
+var _Random2 = _interopRequireDefault(_Random);
+
+var _Data = require('./Data');
+
+var _Data2 = _interopRequireDefault(_Data);
+
+var _Collection = require('./Collection');
+
+var _Call = require('./Call');
+
+var _Call2 = _interopRequireDefault(_Call);
+
+var _Mixin = require('./components/Mixin');
+
+var _Mixin2 = _interopRequireDefault(_Mixin);
+
+var _createContainer = require('./components/createContainer');
+
+var _createContainer2 = _interopRequireDefault(_createContainer);
+
+var _composeWithTracker = require('./components/composeWithTracker');
+
+var _composeWithTracker2 = _interopRequireDefault(_composeWithTracker);
+
+var _ReactiveDict = require('./ReactiveDict');
+
+var _ReactiveDict2 = _interopRequireDefault(_ReactiveDict);
+
+var _User = require('./user/User');
+
+var _User2 = _interopRequireDefault(_User);
+
+var _Accounts = require('./user/Accounts');
+
+var _Accounts2 = _interopRequireDefault(_Accounts);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Meteor = _extends({
+  composeWithTracker: _composeWithTracker2.default,
+  Accounts: _Accounts2.default,
+  Tracker: _trackr2.default,
+  EJSON: _ejson2.default,
+  ReactiveDict: _ReactiveDict2.default,
+  Collection: _Collection.Collection,
+  collection: function collection(name, options) {
+    return new _Collection.Collection(name, options);
   },
-  createContainer,
-  getData() {
-    return Data;
+
+  createContainer: _createContainer2.default,
+  getData: function getData() {
+    return _Data2.default;
   },
-  connectMeteor(reactClass) {
-    return reactMixin.onClass(reactClass, Mixin);
+  connectMeteor: function connectMeteor(reactClass) {
+    return _reactMixin2.default.onClass(reactClass, _Mixin2.default);
   }
-}, User, {
-  status() {
+}, _User2.default, {
+  status: function status() {
     return {
-      connected: Data.ddp ? Data.ddp.status == "connected" : false,
-      status: Data.ddp ? Data.ddp.status : "disconnected"
+      connected: _Data2.default.ddp ? _Data2.default.ddp.status == "connected" : false,
+      status: _Data2.default.ddp ? _Data2.default.ddp.status : "disconnected"
       //retryCount: 0
       //retryTime:
       //reason:
     };
   },
-  call: call,
-  disconnect() {
-    if (Data.ddp) {
-      Data.ddp.disconnect();
+
+  call: _Call2.default,
+  disconnect: function disconnect() {
+    if (_Data2.default.ddp) {
+      _Data2.default.ddp.disconnect();
     }
   },
-  _subscriptionsRestart() {
+  _subscriptionsRestart: function _subscriptionsRestart() {
 
-    for (var i in Data.subscriptions) {
-      const sub = Data.subscriptions[i];
-      Data.ddp.unsub(sub.subIdRemember);
-      sub.subIdRemember = Data.ddp.sub(sub.name, sub.params);
+    for (var i in _Data2.default.subscriptions) {
+      var sub = _Data2.default.subscriptions[i];
+      _Data2.default.ddp.unsub(sub.subIdRemember);
+      sub.subIdRemember = _Data2.default.ddp.sub(sub.name, sub.params);
     }
   },
-  waitDdpConnected: Data.waitDdpConnected.bind(Data),
-  reconnect() {
-    Data.ddp && Data.ddp.connect();
+
+  waitDdpConnected: _Data2.default.waitDdpConnected.bind(_Data2.default),
+  reconnect: function reconnect() {
+    _Data2.default.ddp && _Data2.default.ddp.connect();
   },
-  connect(endpoint, options) {
-    if (!endpoint) endpoint = Data._endpoint;
-    if (!options) options = Data._options;
+  connect: function connect(endpoint, options) {
+    var _this = this;
 
-    Data._endpoint = endpoint;
-    Data._options = options;
+    if (!endpoint) endpoint = _Data2.default._endpoint;
+    if (!options) options = _Data2.default._options;
 
-    this.ddp = Data.ddp = new DDP(_extends({
+    _Data2.default._endpoint = endpoint;
+    _Data2.default._options = options;
+
+    this.ddp = _Data2.default.ddp = new _ddp2.default(_extends({
       endpoint: endpoint,
       SocketConstructor: WebSocket
     }, options));
 
-    if (Data.ddp.autoReconnect) {
-      Data.ddp.connect();
+    if (_Data2.default.ddp.autoReconnect) {
+      _Data2.default.ddp.connect();
     }
 
-    Data.ddp.on("connected", () => {
+    _Data2.default.ddp.on("connected", function () {
 
       // Clear the collections of any stale data in case this is a reconnect
-      if (Data.db && Data.db.collections) {
-        for (var collection in Data.db.collections) {
-          Data.db[collection].remove({});
+      if (_Data2.default.db && _Data2.default.db.collections) {
+        for (var collection in _Data2.default.db.collections) {
+          _Data2.default.db[collection].remove({});
         }
       }
 
-      Data.notify('change');
+      _Data2.default.notify('change');
 
       console.log("Connected to DDP server.");
-      this._loadInitialUser().then(() => {
-        this._subscriptionsRestart();
+      _this._loadInitialUser().then(function () {
+        _this._subscriptionsRestart();
       });
     });
 
-    let lastDisconnect = null;
-    Data.ddp.on("disconnected", () => {
+    var lastDisconnect = null;
+    _Data2.default.ddp.on("disconnected", function () {
 
-      Data.notify('change');
+      _Data2.default.notify('change');
 
       console.log("Disconnected from DDP server.");
 
-      if (!Data.ddp.autoReconnect) return;
+      if (!_Data2.default.ddp.autoReconnect) return;
 
       if (!lastDisconnect || new Date() - lastDisconnect > 3000) {
-        Data.ddp.connect();
+        _Data2.default.ddp.connect();
       }
 
       lastDisconnect = new Date();
     });
 
-    Data.ddp.on("added", message => {
-      if (!Data.db[message.collection]) {
-        Data.db.addCollection(message.collection);
+    _Data2.default.ddp.on("added", function (message) {
+      if (!_Data2.default.db[message.collection]) {
+        _Data2.default.db.addCollection(message.collection);
       }
-      Data.db[message.collection].upsert(_extends({ _id: message.id }, message.fields));
+      _Data2.default.db[message.collection].upsert(_extends({ _id: message.id }, message.fields));
     });
 
-    Data.ddp.on("ready", message => {
-      const idsMap = new Map();
-      for (var i in Data.subscriptions) {
-        const sub = Data.subscriptions[i];
+    _Data2.default.ddp.on("ready", function (message) {
+      var idsMap = new Map();
+      for (var i in _Data2.default.subscriptions) {
+        var sub = _Data2.default.subscriptions[i];
         idsMap.set(sub.subIdRemember, sub.id);
       }
       for (var i in message.subs) {
-        const subId = idsMap.get(message.subs[i]);
+        var subId = idsMap.get(message.subs[i]);
         if (subId) {
-          const sub = Data.subscriptions[subId];
-          sub.ready = true;
-          sub.readyDeps.changed();
-          sub.readyCallback && sub.readyCallback();
+          var _sub = _Data2.default.subscriptions[subId];
+          _sub.ready = true;
+          _sub.readyDeps.changed();
+          _sub.readyCallback && _sub.readyCallback();
         }
       }
     });
 
-    Data.ddp.on("changed", message => {
-      Data.db[message.collection] && Data.db[message.collection].upsert(_extends({ _id: message.id }, message.fields));
+    _Data2.default.ddp.on("changed", function (message) {
+      _Data2.default.db[message.collection] && _Data2.default.db[message.collection].upsert(_extends({ _id: message.id }, message.fields));
     });
 
-    Data.ddp.on("removed", message => {
-      Data.db[message.collection] && Data.db[message.collection].del(message.id);
+    _Data2.default.ddp.on("removed", function (message) {
+      _Data2.default.db[message.collection] && _Data2.default.db[message.collection].del(message.id);
     });
-    Data.ddp.on("result", message => {
-      const call = Data.calls.find(call => call.id == message.id);
+    _Data2.default.ddp.on("result", function (message) {
+      var call = _Data2.default.calls.find(function (call) {
+        return call.id == message.id;
+      });
       if (typeof call.callback == 'function') call.callback(message.error, message.result);
-      Data.calls.splice(Data.calls.findIndex(call => call.id == message.id), 1);
+      _Data2.default.calls.splice(_Data2.default.calls.findIndex(function (call) {
+        return call.id == message.id;
+      }), 1);
     });
 
-    Data.ddp.on("nosub", message => {
-      for (var i in Data.subscriptions) {
-        const sub = Data.subscriptions[i];
+    _Data2.default.ddp.on("nosub", function (message) {
+      for (var i in _Data2.default.subscriptions) {
+        var sub = _Data2.default.subscriptions[i];
         if (sub.subIdRemember == message.id) {
           console.warn("No subscription existing for", sub.name);
         }
       }
     });
   },
-  subscribe(name) {
+  subscribe: function subscribe(name) {
     var params = Array.prototype.slice.call(arguments, 1);
     var callbacks = {};
     if (params.length) {
@@ -191,13 +243,13 @@ const Meteor = _extends({
     // them all active.
 
 
-    let existing = false;
-    for (var i in Data.subscriptions) {
-      const sub = Data.subscriptions[i];
-      if (sub.inactive && sub.name === name && EJSON.equals(sub.params, params)) existing = sub;
+    var existing = false;
+    for (var i in _Data2.default.subscriptions) {
+      var sub = _Data2.default.subscriptions[i];
+      if (sub.inactive && sub.name === name && _ejson2.default.equals(sub.params, params)) existing = sub;
     }
 
-    let id;
+    var id = void 0;
     if (existing) {
       id = existing.id;
       existing.inactive = false;
@@ -217,22 +269,22 @@ const Meteor = _extends({
 
       // New sub! Generate an id, save it locally, and send message.
 
-      id = Random.id();
-      const subIdRemember = Data.ddp.sub(name, params);
+      id = _Random2.default.id();
+      var subIdRemember = _Data2.default.ddp.sub(name, params);
 
-      Data.subscriptions[id] = {
+      _Data2.default.subscriptions[id] = {
         id: id,
         subIdRemember: subIdRemember,
         name: name,
-        params: EJSON.clone(params),
+        params: _ejson2.default.clone(params),
         inactive: false,
         ready: false,
-        readyDeps: new Trackr.Dependency(),
+        readyDeps: new _trackr2.default.Dependency(),
         readyCallback: callbacks.onReady,
         stopCallback: callbacks.onStop,
-        stop: function () {
-          Data.ddp.unsub(this.subIdRemember);
-          delete Data.subscriptions[this.id];
+        stop: function stop() {
+          _Data2.default.ddp.unsub(this.subIdRemember);
+          delete _Data2.default.subscriptions[this.id];
           this.ready && this.readyDeps.changed();
 
           if (callbacks.onStop) {
@@ -244,33 +296,33 @@ const Meteor = _extends({
 
     // return a handle to the application.
     var handle = {
-      stop: function () {
-        if (Data.subscriptions[id]) Data.subscriptions[id].stop();
+      stop: function stop() {
+        if (_Data2.default.subscriptions[id]) _Data2.default.subscriptions[id].stop();
       },
-      ready: function () {
-        if (!Data.subscriptions[id]) return false;
+      ready: function ready() {
+        if (!_Data2.default.subscriptions[id]) return false;
 
-        var record = Data.subscriptions[id];
+        var record = _Data2.default.subscriptions[id];
         record.readyDeps.depend();
         return record.ready;
       },
       subscriptionId: id
     };
 
-    if (Trackr.active) {
+    if (_trackr2.default.active) {
       // We're in a reactive computation, so we'd like to unsubscribe when the
       // computation is invalidated... but not if the rerun just re-subscribes
       // to the same subscription!  When a rerun happens, we use onInvalidate
       // as a change to mark the subscription "inactive" so that it can
       // be reused from the rerun.  If it isn't reused, it's killed from
       // an afterFlush.
-      Trackr.onInvalidate(function (c) {
-        if (Data.subscriptions[id]) {
-          Data.subscriptions[id].inactive = true;
+      _trackr2.default.onInvalidate(function (c) {
+        if (_Data2.default.subscriptions[id]) {
+          _Data2.default.subscriptions[id].inactive = true;
         }
 
-        Trackr.afterFlush(function () {
-          if (Data.subscriptions[id] && Data.subscriptions[id].inactive) {
+        _trackr2.default.afterFlush(function () {
+          if (_Data2.default.subscriptions[id] && _Data2.default.subscriptions[id].inactive) {
             handle.stop();
           }
         });
@@ -280,4 +332,4 @@ const Meteor = _extends({
     return handle;
   }
 });
-export default Meteor;
+exports.default = Meteor;

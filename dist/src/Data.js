@@ -1,15 +1,31 @@
-import minimongo from 'minimongo-cache';
-import Trackr from 'trackr';
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _minimongoCache = require('minimongo-cache');
+
+var _minimongoCache2 = _interopRequireDefault(_minimongoCache);
+
+var _trackr = require('trackr');
+
+var _trackr2 = _interopRequireDefault(_trackr);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 process.nextTick = setImmediate;
 
-const db = new minimongo();
+var db = new _minimongoCache2.default();
 db.debug = false;
 
 function runAfterOtherComputations(fn) {
-  Trackr.afterFlush(() => fn());
+  _trackr2.default.afterFlush(function () {
+    return fn();
+  });
 }
 
-const Data = {
+var Data = {
   _endpoint: null,
   _options: null,
   ddp: null,
@@ -17,62 +33,68 @@ const Data = {
   db: db,
   calls: [],
 
-  getUrl() {
+  getUrl: function getUrl() {
     return this._endpoint.substring(0, this._endpoint.indexOf('/websocket'));
   },
+  waitDdpReady: function waitDdpReady(cb) {
+    var _this = this;
 
-  waitDdpReady(cb) {
     if (this.ddp) {
       cb();
     } else {
-      runAfterOtherComputations(() => {
-        this.waitDdpReady(cb);
+      runAfterOtherComputations(function () {
+        _this.waitDdpReady(cb);
       });
     }
   },
 
+
   _cbs: [],
-  onChange(cb) {
+  onChange: function onChange(cb) {
     this.db.on('change', cb);
     this.ddp.on('connected', cb);
     this.ddp.on('disconnected', cb);
     this.on('loggingIn', cb);
     this.on('change', cb);
   },
-  offChange(cb) {
+  offChange: function offChange(cb) {
     this.db.off('change', cb);
     this.ddp.off('connected', cb);
     this.ddp.off('disconnected', cb);
     this.off('loggingIn', cb);
     this.off('change', cb);
   },
-  on(eventName, cb) {
+  on: function on(eventName, cb) {
     this._cbs.push({
       eventName: eventName,
       callback: cb
     });
   },
-  off(eventName, cb) {
-    this._cbs.splice(this._cbs.findIndex(_cb => _cb.callback == cb && _cb.eventName == eventName), 1);
+  off: function off(eventName, cb) {
+    this._cbs.splice(this._cbs.findIndex(function (_cb) {
+      return _cb.callback == cb && _cb.eventName == eventName;
+    }), 1);
   },
-  notify(eventName) {
-    this._cbs.map(cb => {
+  notify: function notify(eventName) {
+    this._cbs.map(function (cb) {
       if (cb.eventName == eventName && typeof cb.callback == 'function') {
         cb.callback();
       }
     });
   },
-  waitDdpConnected(cb) {
+  waitDdpConnected: function waitDdpConnected(cb) {
+    var _this2 = this;
+
     if (this.ddp && this.ddp.status == 'connected') {
       cb();
     } else if (this.ddp) {
       this.ddp.once('connected', cb);
     } else {
-      setTimeout(() => {
-        this.waitDdpConnected(cb);
+      setTimeout(function () {
+        _this2.waitDdpConnected(cb);
       }, 10);
     }
   }
 };
 
-export default Data;
+exports.default = Data;

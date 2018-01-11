@@ -1,187 +1,257 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Collection = undefined;
+
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-import Tracker from 'trackr';
-import EJSON from 'ejson';
-import _ from 'underscore';
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-import Data from './Data';
-import Random from '../lib/Random';
-import call from './Call';
-import { isPlainObject } from "../lib/utils.js";
+var _trackr = require('trackr');
 
-class Cursor {
-  constructor(collection, docs) {
+var _trackr2 = _interopRequireDefault(_trackr);
+
+var _ejson = require('ejson');
+
+var _ejson2 = _interopRequireDefault(_ejson);
+
+var _underscore = require('underscore');
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _Data = require('./Data');
+
+var _Data2 = _interopRequireDefault(_Data);
+
+var _Random = require('../lib/Random');
+
+var _Random2 = _interopRequireDefault(_Random);
+
+var _Call = require('./Call');
+
+var _Call2 = _interopRequireDefault(_Call);
+
+var _utils = require('../lib/utils.js');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Cursor = function () {
+  function Cursor(collection, docs) {
+    _classCallCheck(this, Cursor);
+
     this._docs = docs || [];
     this._collection = collection;
   }
 
-  count() {
-    return this._docs.length;
-  }
+  _createClass(Cursor, [{
+    key: 'count',
+    value: function count() {
+      return this._docs.length;
+    }
+  }, {
+    key: 'fetch',
+    value: function fetch() {
+      return this._transformedDocs();
+    }
+  }, {
+    key: 'forEach',
+    value: function forEach(callback) {
+      this._transformedDocs().forEach(callback);
+    }
+  }, {
+    key: 'map',
+    value: function map(callback) {
+      return this._transformedDocs().map(callback);
+    }
+  }, {
+    key: '_transformedDocs',
+    value: function _transformedDocs() {
+      return this._collection._transform ? this._docs.map(this._collection._transform) : this._docs;
+    }
+  }]);
 
-  fetch() {
-    return this._transformedDocs();
-  }
+  return Cursor;
+}();
 
-  forEach(callback) {
-    this._transformedDocs().forEach(callback);
-  }
+var Collection = function () {
+  function Collection(name) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  map(callback) {
-    return this._transformedDocs().map(callback);
-  }
+    _classCallCheck(this, Collection);
 
-  _transformedDocs() {
-    return this._collection._transform ? this._docs.map(this._collection._transform) : this._docs;
-  }
-}
+    if (!_Data2.default.db[name]) _Data2.default.db.addCollection(name);
 
-export class Collection {
-  constructor(name, options = {}) {
-    if (!Data.db[name]) Data.db.addCollection(name);
-
-    this._collection = Data.db[name];
+    this._collection = _Data2.default.db[name];
     this._cursoredFind = options.cursoredFind;
     this._name = name;
     this._transform = wrapTransform(options.transform);
   }
 
-  find(selector, options) {
-    let result;
-    let docs;
+  _createClass(Collection, [{
+    key: 'find',
+    value: function find(selector, options) {
+      var result = void 0;
+      var docs = void 0;
 
-    if (typeof selector == 'string') {
-      if (options) {
-        docs = this._collection.findOne({ _id: selector }, options);
+      if (typeof selector == 'string') {
+        if (options) {
+          docs = this._collection.findOne({ _id: selector }, options);
+        } else {
+          docs = this._collection.get(selector);
+        }
+
+        if (docs) docs = [docs];
       } else {
-        docs = this._collection.get(selector);
+        docs = this._collection.find(selector, options);
       }
 
-      if (docs) docs = [docs];
-    } else {
-      docs = this._collection.find(selector, options);
-    }
+      if (this._cursoredFind) {
+        result = new Cursor(this, docs);
+      } else {
+        if (docs && this._transform) docs = docs.map(this._transform);
 
-    if (this._cursoredFind) {
-      result = new Cursor(this, docs);
-    } else {
-      if (docs && this._transform) docs = docs.map(this._transform);
-
-      result = docs;
-    }
-
-    return result;
-  }
-
-  findOne(selector, options) {
-    let result = this.find(selector, options);
-
-    if (result) {
-      if (this._cursoredFind) result = result.fetch();
-
-      result = result[0];
-    }
-
-    return result;
-  }
-
-  insert(item, callback = () => {}) {
-    let id;
-
-    if ('_id' in item) {
-      if (!item._id || typeof item._id != 'string') {
-        return callback("Meteor requires document _id fields to be non-empty strings");
+        result = docs;
       }
-      id = item._id;
-    } else {
-      id = item._id = Random.id();
+
+      return result;
     }
+  }, {
+    key: 'findOne',
+    value: function findOne(selector, options) {
+      var result = this.find(selector, options);
 
-    if (this._collection.get(id)) return callback({ error: 409, reason: `Duplicate key _id with value ${id}` });
+      if (result) {
+        if (this._cursoredFind) result = result.fetch();
 
-    this._collection.upsert(item);
-    Data.waitDdpConnected(() => {
-      call(`/${this._name}/insert`, item, err => {
-        if (err) {
-          this._collection.del(id);
-          return callback(err);
-        }
+        result = result[0];
+      }
 
-        callback(null, id);
-      });
-    });
-
-    return id;
-  }
-
-  update(id, modifier, options = {}, callback = () => {}) {
-    if (typeof options == 'function') {
-      callback = options;
-      options = {};
+      return result;
     }
+  }, {
+    key: 'insert',
+    value: function insert(item) {
+      var _this = this;
 
-    if (!this._collection.get(id)) return callback({
-      error: 409,
-      reason: `Item not found in collection ${this._name} with id ${id}`
-    });
+      var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
 
-    // change mini mongo for optimize UI changes
-    this._collection.upsert(_extends({ _id: id }, modifier.$set));
+      var id = void 0;
 
-    Data.waitDdpConnected(() => {
-      call(`/${this._name}/update`, { _id: id }, modifier, err => {
-        if (err) {
-          return callback(err);
+      if ('_id' in item) {
+        if (!item._id || typeof item._id != 'string') {
+          return callback("Meteor requires document _id fields to be non-empty strings");
         }
+        id = item._id;
+      } else {
+        id = item._id = _Random2.default.id();
+      }
 
-        callback(null, id);
-      });
-    });
-  }
+      if (this._collection.get(id)) return callback({ error: 409, reason: 'Duplicate key _id with value ' + id });
 
-  remove(id, callback = () => {}) {
-    const element = this.findOne(id);
-
-    if (element) {
-      this._collection.del(element._id);
-
-      Data.waitDdpConnected(() => {
-        call(`/${this._name}/remove`, { _id: id }, (err, res) => {
+      this._collection.upsert(item);
+      _Data2.default.waitDdpConnected(function () {
+        (0, _Call2.default)('/' + _this._name + '/insert', item, function (err) {
           if (err) {
-            this._collection.upsert(element);
+            _this._collection.del(id);
             return callback(err);
           }
-          callback(null, res);
+
+          callback(null, id);
         });
       });
-    } else {
-      callback(`No document with _id : ${id}`);
+
+      return id;
     }
-  }
+  }, {
+    key: 'update',
+    value: function update(id, modifier) {
+      var _this2 = this;
 
-  helpers(helpers) {
-    var self = this;
-    let _transform;
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var callback = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : function () {};
 
-    if (this._transform && !this._helpers) _transform = this._transform;
+      if (typeof options == 'function') {
+        callback = options;
+        options = {};
+      }
 
-    if (!this._helpers) {
-      this._helpers = function Document(doc) {
-        return _.extend(this, doc);
-      };
-      this._transform = doc => {
-        if (_transform) {
-          doc = _transform(doc);
+      if (!this._collection.get(id)) return callback({
+        error: 409,
+        reason: 'Item not found in collection ' + this._name + ' with id ' + id
+      });
+
+      // change mini mongo for optimize UI changes
+      this._collection.upsert(_extends({ _id: id }, modifier.$set));
+
+      _Data2.default.waitDdpConnected(function () {
+        (0, _Call2.default)('/' + _this2._name + '/update', { _id: id }, modifier, function (err) {
+          if (err) {
+            return callback(err);
+          }
+
+          callback(null, id);
+        });
+      });
+    }
+  }, {
+    key: 'remove',
+    value: function remove(id) {
+      var _this3 = this;
+
+      var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
+
+      var element = this.findOne(id);
+
+      if (element) {
+        this._collection.del(element._id);
+
+        _Data2.default.waitDdpConnected(function () {
+          (0, _Call2.default)('/' + _this3._name + '/remove', { _id: id }, function (err, res) {
+            if (err) {
+              _this3._collection.upsert(element);
+              return callback(err);
+            }
+            callback(null, res);
+          });
+        });
+      } else {
+        callback('No document with _id : ' + id);
+      }
+    }
+  }, {
+    key: 'helpers',
+    value: function helpers(_helpers) {
+      var _this4 = this;
+
+      var self = this;
+      var _transform = void 0;
+
+      if (this._transform && !this._helpers) _transform = this._transform;
+
+      if (!this._helpers) {
+        this._helpers = function Document(doc) {
+          return _underscore2.default.extend(this, doc);
         };
-        return new this._helpers(doc);
-      };
-    }
+        this._transform = function (doc) {
+          if (_transform) {
+            doc = _transform(doc);
+          };
+          return new _this4._helpers(doc);
+        };
+      }
 
-    _.each(helpers, (helper, key) => {
-      this._helpers.prototype[key] = helper;
-    });
-  }
-}
+      _underscore2.default.each(_helpers, function (helper, key) {
+        _this4._helpers.prototype[key] = helper;
+      });
+    }
+  }]);
+
+  return Collection;
+}();
 
 //From Meteor core
 
@@ -194,14 +264,17 @@ export class Collection {
 // - If the return value has an _id field, verify that it matches the
 //   original _id field
 // - If the return value doesn't have an _id field, add it back.
+
+
+exports.Collection = Collection;
 function wrapTransform(transform) {
   if (!transform) return null;
 
   // No need to doubly-wrap transforms.
   if (transform.__wrappedTransform__) return transform;
 
-  var wrapped = function (doc) {
-    if (!_.has(doc, '_id')) {
+  var wrapped = function wrapped(doc) {
+    if (!_underscore2.default.has(doc, '_id')) {
       // XXX do we ever have a transform on the oplog's collection? because that
       // collection has no _id.
       throw new Error("can only transform documents with _id");
@@ -209,16 +282,16 @@ function wrapTransform(transform) {
 
     var id = doc._id;
     // XXX consider making tracker a weak dependency and checking Package.tracker here
-    var transformed = Tracker.nonreactive(function () {
+    var transformed = _trackr2.default.nonreactive(function () {
       return transform(doc);
     });
 
-    if (!isPlainObject(transformed)) {
+    if (!(0, _utils.isPlainObject)(transformed)) {
       throw new Error("transform must return object");
     }
 
-    if (_.has(transformed, '_id')) {
-      if (!EJSON.equals(transformed._id, id)) {
+    if (_underscore2.default.has(transformed, '_id')) {
+      if (!_ejson2.default.equals(transformed._id, id)) {
         throw new Error("transformed document can't have different _id");
       }
     } else {

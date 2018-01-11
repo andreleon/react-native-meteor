@@ -1,5 +1,13 @@
-//https://github.com/meteor/meteor/tree/master/packages/mongo-id
-import EJSON from "ejson";
+"use strict";
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; //https://github.com/meteor/meteor/tree/master/packages/mongo-id
+
+
+var _ejson = require("ejson");
+
+var _ejson2 = _interopRequireDefault(_ejson);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 MongoID = {};
 
@@ -50,7 +58,7 @@ MongoID.ObjectID.prototype.valueOf = MongoID.ObjectID.prototype.toJSONValue = Mo
   return this._str;
 };
 
-EJSON.addType("oid", function (str) {
+_ejson2.default.addType("oid", function (str) {
   return new MongoID.ObjectID(str);
 });
 
@@ -71,7 +79,7 @@ MongoID.idStringify = function (id) {
     }
   } else if (id === undefined) {
     return '-';
-  } else if (typeof id === 'object' && id !== null) {
+  } else if ((typeof id === "undefined" ? "undefined" : _typeof(id)) === 'object' && id !== null) {
     throw new Error("Meteor does not currently support objects other than ObjectID as ids");
   } else {
     // Numbers, true, false, null

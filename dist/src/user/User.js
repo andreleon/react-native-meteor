@@ -1,121 +1,167 @@
-import Data from '../Data';
-import { hashPassword } from '../../lib/utils';
-import call from '../Call';
+'use strict';
 
-const TOKEN_KEY = 'Meteor.loginToken';
-const User = {
-  user() {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _Data = require('../Data');
+
+var _Data2 = _interopRequireDefault(_Data);
+
+var _utils = require('../../lib/utils');
+
+var _Call = require('../Call');
+
+var _Call2 = _interopRequireDefault(_Call);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+var TOKEN_KEY = 'Meteor.loginToken';
+var User = {
+  user: function user() {
     if (!this._userIdSaved) return null;
 
     return this.collection('users').findOne(this._userIdSaved);
   },
-  userId() {
+  userId: function userId() {
     if (!this._userIdSaved) return null;
 
-    const user = this.collection('users').findOne(this._userIdSaved);
+    var user = this.collection('users').findOne(this._userIdSaved);
     return user && user._id;
   },
+
   _isLoggingIn: true,
-  loggingIn() {
+  loggingIn: function loggingIn() {
     return this._isLoggingIn;
   },
-  logout(callback) {
-    call("logout", err => {
-      this.handleLogout();
-      this.connect();
+  logout: function logout(callback) {
+    var _this = this;
+
+    (0, _Call2.default)("logout", function (err) {
+      _this.handleLogout();
+      _this.connect();
 
       typeof callback == 'function' && callback(err);
     });
   },
-  handleLogout() {
+  handleLogout: function handleLogout() {
     localStorage.removeItem(TOKEN_KEY);
-    Data._tokenIdSaved = null;
+    _Data2.default._tokenIdSaved = null;
     this._userIdSaved = null;
   },
-  loginWithPassword(selector, password, callback) {
+  loginWithPassword: function loginWithPassword(selector, password, callback) {
+    var _this2 = this;
+
     if (typeof selector === 'string') {
       if (selector.indexOf('@') === -1) selector = { username: selector };else selector = { email: selector };
     }
 
     this._startLoggingIn();
-    call("login", {
+    (0, _Call2.default)("login", {
       user: selector,
-      password: hashPassword(password)
-    }, (err, result) => {
-      this._endLoggingIn();
+      password: (0, _utils.hashPassword)(password)
+    }, function (err, result) {
+      _this2._endLoggingIn();
 
-      this._handleLoginCallback(err, result);
+      _this2._handleLoginCallback(err, result);
 
       typeof callback == 'function' && callback(err);
     });
   },
-  logoutOtherClients(callback = () => {}) {
-    call('getNewToken', (err, res) => {
+  logoutOtherClients: function logoutOtherClients() {
+    var _this3 = this;
+
+    var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
+
+    (0, _Call2.default)('getNewToken', function (err, res) {
       if (err) return callback(err);
 
-      this._handleLoginCallback(err, res);
+      _this3._handleLoginCallback(err, res);
 
-      call('removeOtherTokens', err => {
+      (0, _Call2.default)('removeOtherTokens', function (err) {
         callback(err);
       });
     });
   },
-  _login(user, callback) {
-    this._startLoggingIn();
-    this.call("login", user, (err, result) => {
-      this._endLoggingIn();
+  _login: function _login(user, callback) {
+    var _this4 = this;
 
-      this._handleLoginCallback(err, result);
+    this._startLoggingIn();
+    this.call("login", user, function (err, result) {
+      _this4._endLoggingIn();
+
+      _this4._handleLoginCallback(err, result);
 
       typeof callback == 'function' && callback(err);
     });
   },
-  _startLoggingIn() {
+  _startLoggingIn: function _startLoggingIn() {
     this._isLoggingIn = true;
-    Data.notify('loggingIn');
+    _Data2.default.notify('loggingIn');
   },
-  _endLoggingIn() {
+  _endLoggingIn: function _endLoggingIn() {
     this._isLoggingIn = false;
-    Data.notify('loggingIn');
+    _Data2.default.notify('loggingIn');
   },
-  _handleLoginCallback(err, result) {
+  _handleLoginCallback: function _handleLoginCallback(err, result) {
     if (!err) {
       //save user id and token
       localStorage.setItem(TOKEN_KEY, result.token);
-      Data._tokenIdSaved = result.token;
+      _Data2.default._tokenIdSaved = result.token;
       this._userIdSaved = result.id;
-      Data.notify('onLogin');
+      _Data2.default.notify('onLogin');
     } else {
-      Data.notify('onLoginFailure');
+      _Data2.default.notify('onLoginFailure');
       this.handleLogout();
     }
-    Data.notify('change');
+    _Data2.default.notify('change');
   },
-  _loginWithToken(value) {
-    Data._tokenIdSaved = value;
+  _loginWithToken: function _loginWithToken(value) {
+    var _this5 = this;
+
+    _Data2.default._tokenIdSaved = value;
     if (value !== null) {
       this._startLoggingIn();
-      call('login', { resume: value }, (err, result) => {
-        this._endLoggingIn();
-        this._handleLoginCallback(err, result);
+      (0, _Call2.default)('login', { resume: value }, function (err, result) {
+        _this5._endLoggingIn();
+        _this5._handleLoginCallback(err, result);
       });
     } else {
       this._endLoggingIn();
     }
   },
-  getAuthToken() {
-    return Data._tokenIdSaved;
+  getAuthToken: function getAuthToken() {
+    return _Data2.default._tokenIdSaved;
   },
-  async _loadInitialUser() {
-    var value = null;
-    try {
-      value = localStorage.getItem(TOKEN_KEY);
-    } catch (error) {
-      console.warn('localStorage error: ' + error.message);
-    } finally {
-      this._loginWithToken(value);
-    }
+  _loadInitialUser: function _loadInitialUser() {
+    var _this6 = this;
+
+    return _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      var value;
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              value = null;
+
+              try {
+                value = localStorage.getItem(TOKEN_KEY);
+              } catch (error) {
+                console.warn('localStorage error: ' + error.message);
+              } finally {
+                _this6._loginWithToken(value);
+              }
+
+            case 2:
+            case 'end':
+              return _context.stop();
+          }
+        }
+      }, _callee, _this6);
+    }))();
   }
 };
 
-export default User;
+exports.default = User;

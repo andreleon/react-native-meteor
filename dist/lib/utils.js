@@ -1,18 +1,38 @@
-import SHA256 from 'crypto-js/sha256';
-import _ from "underscore";
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+exports.uniqueId = uniqueId;
+exports.contains = contains;
+exports.hashPassword = hashPassword;
+exports.isPlainObject = isPlainObject;
+
+var _sha = require("crypto-js/sha256");
+
+var _sha2 = _interopRequireDefault(_sha);
+
+var _underscore = require("underscore");
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var i = 0;
-export function uniqueId() {
+function uniqueId() {
   return (i++).toString();
 }
 
-export function contains(array, element) {
+function contains(array, element) {
   return array.indexOf(element) !== -1;
 }
 
-export function hashPassword(password) {
+function hashPassword(password) {
   return {
-    digest: SHA256(password).toString(),
+    digest: (0, _sha2.default)(password).toString(),
     algorithm: "sha-256"
   };
 }
@@ -27,7 +47,7 @@ var hasOwn = class2type.hasOwnProperty;
 var support = {};
 
 // Populate the class2type map
-_.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function (name, i) {
+_underscore2.default.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function (name, i) {
   class2type["[object " + name + "]"] = name.toLowerCase();
 });
 
@@ -35,7 +55,7 @@ function type(obj) {
   if (obj == null) {
     return obj + "";
   }
-  return typeof obj === "object" || typeof obj === "function" ? class2type[toString.call(obj)] || "object" : typeof obj;
+  return (typeof obj === "undefined" ? "undefined" : _typeof(obj)) === "object" || typeof obj === "function" ? class2type[toString.call(obj)] || "object" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
 }
 
 function isWindow(obj) {
@@ -43,7 +63,7 @@ function isWindow(obj) {
   return obj != null && obj == obj.window;
 }
 
-export function isPlainObject(obj) {
+function isPlainObject(obj) {
   var key;
 
   // Must be an Object.

@@ -1,26 +1,47 @@
-import Data from '../Data';
-import call from '../Call';
-import User from './User';
-import { hashPassword } from '../../lib/utils';
+'use strict';
 
-const Accounts = {
-  createUser(options, callback = () => {}) {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _Data = require('../Data');
+
+var _Data2 = _interopRequireDefault(_Data);
+
+var _Call = require('../Call');
+
+var _Call2 = _interopRequireDefault(_Call);
+
+var _User = require('./User');
+
+var _User2 = _interopRequireDefault(_User);
+
+var _utils = require('../../lib/utils');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Accounts = {
+  createUser: function createUser(options) {
+    var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
+
     if (options.username) options.username = options.username;
     if (options.email) options.email = options.email;
 
     // Replace password with the hashed password.
-    options.password = hashPassword(options.password);
+    options.password = (0, _utils.hashPassword)(options.password);
 
-    User._startLoggingIn();
-    call("createUser", options, (err, result) => {
-      User._endLoggingIn();
+    _User2.default._startLoggingIn();
+    (0, _Call2.default)("createUser", options, function (err, result) {
+      _User2.default._endLoggingIn();
 
-      User._handleLoginCallback(err, result);
+      _User2.default._handleLoginCallback(err, result);
 
       callback(err);
     });
   },
-  changePassword(oldPassword, newPassword, callback = () => {}) {
+  changePassword: function changePassword(oldPassword, newPassword) {
+    var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function () {};
+
 
     //TODO check Meteor.user() to prevent if not logged
 
@@ -28,39 +49,43 @@ const Accounts = {
       return callback("Password may not be empty");
     }
 
-    call("changePassword", oldPassword ? hashPassword(oldPassword) : null, hashPassword(newPassword), (err, res) => {
+    (0, _Call2.default)("changePassword", oldPassword ? (0, _utils.hashPassword)(oldPassword) : null, (0, _utils.hashPassword)(newPassword), function (err, res) {
 
       callback(err);
     });
   },
-  forgotPassword(options, callback = () => {}) {
+  forgotPassword: function forgotPassword(options) {
+    var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
+
     if (!options.email) {
       return callback("Must pass options.email");
     }
 
-    call("forgotPassword", options, err => {
+    (0, _Call2.default)("forgotPassword", options, function (err) {
       callback(err);
     });
   },
-  resetPassword(token, newPassword, callback = () => {}) {
+  resetPassword: function resetPassword(token, newPassword) {
+    var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function () {};
+
     if (!newPassword) {
       return callback("Must pass a new password");
     }
 
-    call("resetPassword", token, hashPassword(newPassword), (err, result) => {
+    (0, _Call2.default)("resetPassword", token, (0, _utils.hashPassword)(newPassword), function (err, result) {
       if (!err) {
-        User._loginWithToken(result.token);
+        _User2.default._loginWithToken(result.token);
       }
 
       callback(err);
     });
   },
-  onLogin(cb) {
-    Data.on('onLogin', cb);
+  onLogin: function onLogin(cb) {
+    _Data2.default.on('onLogin', cb);
   },
-  onLoginFailure(cb) {
-    Data.on('onLoginFailure', cb);
+  onLoginFailure: function onLoginFailure(cb) {
+    _Data2.default.on('onLoginFailure', cb);
   }
 };
 
-export default Accounts;
+exports.default = Accounts;
