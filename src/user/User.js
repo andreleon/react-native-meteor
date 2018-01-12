@@ -111,13 +111,10 @@ module.exports = {
   },
   _loadInitialUser() {
     var value = null;
-    try {
+    return new Promise((resolve, reject) => {
       value = localStorage.getItem(TOKEN_KEY);
-    } catch (error) {
-      console.warn('localStorage error: ' + error.message);
-    } finally {
       this._loginWithToken(value);
-    }
-
+      resolve();
+    });
   }
 }

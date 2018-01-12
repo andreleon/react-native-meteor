@@ -131,13 +131,13 @@ module.exports = {
     return _Data2.default._tokenIdSaved;
   },
   _loadInitialUser: function _loadInitialUser() {
+    var _this6 = this;
+
     var value = null;
-    try {
+    return new Promise(function (resolve, reject) {
       value = localStorage.getItem(TOKEN_KEY);
-    } catch (error) {
-      console.warn('localStorage error: ' + error.message);
-    } finally {
-      this._loginWithToken(value);
-    }
+      _this6._loginWithToken(value);
+      resolve();
+    });
   }
 };
