@@ -139,7 +139,7 @@ class MeteorDataManager {
           try {
             component.forceUpdate();
           } catch(e) {
-            console.error(e);
+            window.console.error(e);
           }
 
         }

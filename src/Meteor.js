@@ -90,7 +90,7 @@ module.exports = {
 
       Data.notify('change');
 
-      console.log("Connected to DDP server.");
+      window.console.log("Connected to DDP server.");
       this._loadInitialUser().then(() => {
         this._subscriptionsRestart();
       });
@@ -101,7 +101,7 @@ module.exports = {
 
       Data.notify('change');
 
-      console.log("Disconnected from DDP server.");
+      window.console.log("Disconnected from DDP server.");
 
       if (!Data.ddp.autoReconnect) return;
 
@@ -154,7 +154,7 @@ module.exports = {
       for(var i in Data.subscriptions) {
         const sub = Data.subscriptions[i];
         if(sub.subIdRemember == message.id) {
-          console.warn("No subscription existing for", sub.name);
+          window.console.warn("No subscription existing for", sub.name);
         }
       }
     });
